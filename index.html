@@ -12,6 +12,78 @@
   <meta name="color-scheme" content="dark">
 
   <style>
+    /* ---------- MOBILE OPTIMIZATION ---------- */
+@media (max-width: 768px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .hero video {
+    object-position: center;
+  }
+
+  h1.title {
+    font-size: 2rem;
+    line-height: 1.1;
+  }
+
+  .subtitle {
+    max-width: 100%;
+    margin: 0 auto 16px auto;
+  }
+
+  .btn-main .inner {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+
+  .agent-showcase {
+    width: 100%;
+    margin: 20px auto;
+  }
+
+  .gallery-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .join {
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .form {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .gallery-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nav .links {
+    display: none;
+  }
+
+  .nav .logo {
+    font-size: 1rem;
+  }
+
+  .btn-main .inner {
+    font-size: 0.8rem;
+  }
+}
+
     :root{
       --bg:#071018;
       --muted:#bfc8d1;
@@ -827,3 +899,4 @@
 </script>
 </body>
 </html>
+
