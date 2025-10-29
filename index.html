@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Elite Strike — Valorant × Cyberpunk</title>
 
   <!-- Fonts & Icons -->
@@ -12,75 +13,87 @@
   <meta name="color-scheme" content="dark">
 
   <style>
-    /* ---------- MOBILE OPTIMIZATION ---------- */
-@media (max-width: 768px) {
+   /* ---------- MOBILE OPTIMIZATION (FIXED) ---------- */
+@media (max-width: 768px) 
+    .hero {
+    padding-top: 80px;
+    height: auto;
+  }
+    {
   .hero-grid {
     grid-template-columns: 1fr;
     text-align: center;
+    gap: 20px;
   }
 
-  .hero video {
-    object-position: center;
+  .hero-left {
+    order: 1;
+  }
+
+  .agent-showcase {
+    order: 2;
+    margin: 20px auto 0 auto;
+    width: 80%;
+    max-width: 320px;
   }
 
   h1.title {
     font-size: 2rem;
-    line-height: 1.1;
+    line-height: 1.2;
   }
 
   .subtitle {
-    max-width: 100%;
-    margin: 0 auto 16px auto;
-  }
-
-  .btn-main .inner {
-    padding: 10px 16px;
-    font-size: 0.9rem;
-  }
-
-  .agent-showcase {
-    width: 100%;
-    margin: 20px auto;
-  }
-
-  .gallery-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-
-  .features-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .join {
-    flex-direction: column;
-    gap: 18px;
-  }
-
-  .form {
-    width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .gallery-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .features-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .nav .links {
-    display: none;
-  }
-
-  .nav .logo {
+    max-width: 90%;
+    margin: 12px auto;
     font-size: 1rem;
   }
 
   .btn-main .inner {
-    font-size: 0.8rem;
+    padding: 12px 20px;
+    font-size: 1rem;
+  }
+
+  .hero-stats {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav .links {
+    display: none; /* hide nav links on small screen */
+  }
+
+  .nav .logo {
+    font-size: 1.2rem;
+  }
+}
+
+/* ---------- SMALL SCREENS (phones under 480px) ---------- */
+@media (max-width: 480px) {
+  .hero-grid {
+    text-align: center;
+  }
+
+  h1.title {
+    font-size: 1.6rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .btn-main .inner {
+    padding: 10px 16px;
+    font-size: 0.85rem;
+  }
+
+  .agent-showcase {
+    max-width: 260px;
+  }
+
+  .gallery-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -899,4 +912,5 @@
 </script>
 </body>
 </html>
+
 
