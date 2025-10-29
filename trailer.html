@@ -9,6 +9,31 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
+    @media (max-width: 768px) {
+  .glow-border {
+    width: 95%;
+  }
+  .trailer-title {
+    font-size: 1.4rem;
+  }
+  .back-btn {
+    font-size: 0.9rem;
+    padding: 10px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .trailer-title {
+    font-size: 1.2rem;
+  }
+  video {
+    border-radius: 10px;
+  }
+  footer {
+    font-size: 0.75rem;
+  }
+}
+
     body {
       margin: 0;
       height: 100vh;
@@ -20,6 +45,8 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      touch-action: manipulation;
+
     }
 
     .glow-border {
@@ -122,3 +149,4 @@
   </script>
 </body>
 </html>
+
