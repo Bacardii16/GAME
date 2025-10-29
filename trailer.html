@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Elite Strike — Official Trailer</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: radial-gradient(circle at center, #050505 0%, #000 100%);
+      color: #00fff0;
+      font-family: 'Rajdhani', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .glow-border {
+      position: relative;
+      width: 85%;
+      max-width: 1100px;
+      border-radius: 16px;
+      box-shadow: 0 0 30px #00fff055, 0 0 50px #ff00c855;
+      overflow: hidden;
+      animation: pulse 3s infinite alternate;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 30px #00fff055, 0 0 50px #ff00c855; }
+      100% { box-shadow: 0 0 50px #00fff0aa, 0 0 80px #ff00c8aa; }
+    }
+
+    video {
+      width: 100%;
+      display: block;
+      border-radius: 16px;
+    }
+
+    .back-btn {
+      margin-top: 30px;
+      padding: 12px 40px;
+      background: linear-gradient(90deg, #00fff0, #ff00c8);
+      border: none;
+      color: #000;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-family: 'Orbitron', sans-serif;
+      text-transform: uppercase;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+      text-decoration: none;
+    }
+
+    .back-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 25px #00fff0aa;
+    }
+
+    .trailer-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 3px;
+      color: #00fff0;
+      text-shadow: 0 0 15px #00fff0;
+      margin-bottom: 20px;
+      animation: flicker 2s infinite alternate;
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+
+    footer {
+      position: absolute;
+      bottom: 10px;
+      font-size: 0.85rem;
+      color: #aaa;
+      text-align: center;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="trailer-title">ELITE STRIKE — OFFICIAL TRAILER</div>
+
+  <div class="glow-border">
+    <video controls autoplay>
+      <source src="trailer.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+  </div>
+
+  <a href="index1.html" class="back-btn">← Back to Main Page</a>
+
+  <footer>&copy; 2025 Elite Strike. All Rights Reserved.</footer>
+
+  <!-- Ambient Background Sound -->
+  <audio id="bgAudio" autoplay loop>
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-space-ambience-2525.mp3" type="audio/mp3">
+  </audio>
+
+  <script>
+    // Lower volume so it stays atmospheric
+    const bgAudio = document.getElementById('bgAudio');
+    bgAudio.volume = 0.25;
+
+    // Stop the ambient sound when navigating away
+    window.addEventListener('beforeunload', () => {
+      bgAudio.pause();
+      bgAudio.currentTime = 0;
+    });
+  </script>
+</body>
+</html>
