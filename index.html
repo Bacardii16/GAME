@@ -1,0 +1,829 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Elite Strike — Valorant × Cyberpunk</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <meta name="color-scheme" content="dark">
+
+  <style>
+    :root{
+      --bg:#071018;
+      --muted:#bfc8d1;
+      --neon-pink:#ff4873;
+      --neon-blue:#00d4ff;
+      --neon-purple:#9b59ff;
+      --glass: rgba(255,255,255,0.04);
+      --accent-grad: linear-gradient(90deg,var(--neon-pink),var(--neon-blue));
+      --ease: cubic-bezier(.2,.9,.3,1);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:'Roboto',sans-serif;background:radial-gradient(1200px 600px at 10% 10%, rgba(16,30,46,0.6), transparent 10%), var(--bg); color:var(--muted); -webkit-font-smoothing:antialiased;}
+    a{color:inherit}
+    .container{max-width:1200px;margin:0 auto;padding:28px;}
+
+    /* -------------------------
+       LOADER (mix of Valorant glitch + cyber scanline)
+       -------------------------*/
+    #loader-wrap{
+      position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg, #04101a 0%, rgba(7,16,24,0.8) 60%);overflow:hidden;
+    }
+    .loader {
+      text-align:center;color:white;transform:translateY(-6px);
+    }
+    .logo {
+      font-weight:900; font-size:36px; letter-spacing:2px; text-transform:uppercase;
+      background:var(--accent-grad); -webkit-background-clip:text; color:transparent;
+      position:relative;
+    }
+    .logo::after{
+      content:"Elite Strike"; position:absolute; left:0; top:0; width:100%; height:100%;
+      color:transparent; text-shadow: 0 0 40px rgba(255,72,115,0.06);
+      mix-blend-mode:screen;
+      animation:glow 1600ms infinite ease-in-out;
+      opacity:.9;
+    }
+    @keyframes glow{
+      0%{filter:blur(0px) opacity(.8)}
+      50%{filter:blur(8px) opacity(1)}
+      100%{filter:blur(0px) opacity(.8)}
+    }
+    /* horizontal scanline */
+    .scan {
+      position:absolute; left:-20%; top:0; width:140%; height:100%;
+      background: linear-gradient(90deg, transparent 0%, rgba(0,212,255,0.035) 48%, rgba(255,72,115,0.02) 52%, transparent 100%);
+      transform: skewX(-12deg);
+      animation:scan 2200ms infinite linear;
+      pointer-events:none; mix-blend-mode:overlay;
+    }
+    @keyframes scan { from {transform:translateY(-120%) skewX(-12deg);} to {transform:translateY(120%) skewX(-12deg);} }
+
+    /* glitch overlays (small offsets for flicker) */
+    .glitch{
+      position:relative; display:inline-block;
+    }
+    .glitch span{
+      position:absolute; left:0; top:0; right:0; bottom:0; display:inline-block;
+      clip-path:polygon(0 0,100% 0,100% 30%,0 30%);
+      transform:translate(0,0);
+      opacity:0.85;
+    }
+    .glitch span:nth-child(1){ color:var(--neon-pink); transform:translate(3px,-2px); animation:glitch1 1s infinite; mix-blend-mode:screen; }
+    .glitch span:nth-child(2){ color:var(--neon-blue); transform:translate(-2px,2px); animation:glitch2 1.25s infinite; mix-blend-mode:screen; }
+    @keyframes glitch1 { 0%{transform:translate(3px,-2px)} 50%{transform:translate(-6px,3px)} 100%{transform:translate(3px,-2px)} }
+    @keyframes glitch2 { 0%{transform:translate(-2px,2px)} 40%{transform:translate(6px,-4px)} 100%{transform:translate(-2px,2px)} }
+
+    /* pulsing ring */
+    .pulse { margin:18px auto 0; width:84px; height:84px; border-radius:999px; background:linear-gradient(90deg, rgba(255,72,115,0.14), rgba(0,212,255,0.12)); box-shadow:0 20px 60px rgba(0,0,0,0.6); display:flex;align-items:center;justify-content:center; }
+    .pulse::after{ content:""; width:44px;height:44px;border-radius:999px;background:linear-gradient(90deg,var(--neon-pink),var(--neon-blue)); animation:pulseRing 1400ms infinite; }
+    @keyframes pulseRing { 0%{transform:scale(1); opacity:1} 70%{transform:scale(1.36); opacity:.45} 100%{transform:scale(1); opacity:1} }
+
+    /* reduced motion respect */
+    @media (prefers-reduced-motion:reduce){
+      .scan, .logo::after, .glitch span, .pulse::after { animation: none !important; }
+    }
+
+    /* -------------------------
+       Progress bar
+       -------------------------*/
+    #progress {
+      position:fixed; left:0; top:0; height:4px; width:0%; background:linear-gradient(90deg,var(--neon-blue),var(--neon-pink));
+      box-shadow:0 6px 28px rgba(0,212,255,0.08); z-index:9000; transition:width .12s linear;
+    }
+
+    /* -------------------------
+       Page layout (hero + sections)
+       -------------------------*/
+    header{position:fixed;left:0;right:0;top:12px;z-index:150;display:flex;justify-content:center;pointer-events:none}
+    .nav{pointer-events:auto;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:8px 14px;border-radius:12px;display:flex;gap:18px;align-items:center;backdrop-filter:blur(6px);box-shadow:0 6px 30px rgba(0,0,0,0.6);}
+    .nav .logo{display:flex;align-items:center;gap:10px;font-weight:900;color:var(--neon-pink);text-transform:uppercase;letter-spacing:1px; pointer-events:none}
+    .nav .links{display:flex;gap:12px;align-items:center}
+    .nav .links a{font-weight:700;padding:8px 10px;border-radius:8px;transition:all .25s var(--ease); color:var(--muted); text-decoration:none}
+    .nav .links a:hover{transform:translateY(-3px); color:white; box-shadow:0 6px 18px rgba(0,0,0,0.4)}
+
+    .hero{height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:40px 12px}
+    .hero video{position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; filter:brightness(.42) saturate(.9); z-index:-2}
+    .hero .gradient-overlay{position:absolute; inset:0; background:linear-gradient(135deg, rgba(15,25,35,0.75), rgba(255,72,115,0.02)); z-index:-1}
+    .hero-grid{display:grid;grid-template-columns:1fr 420px; gap:36px; align-items:center; width:100%; max-width:1200px}
+    .kicker{display:inline-block;padding:6px 10px;border-radius:8px;background:linear-gradient(90deg, rgba(255,72,115,0.08), rgba(0,212,255,0.06)); color:var(--neon-pink); font-weight:700; letter-spacing:1px; font-size:13px; margin-bottom:16px}
+    h1.title{font-size:56px;line-height:0.95;margin:0;color:transparent;background:linear-gradient(90deg,var(--neon-pink),var(--neon-blue)); -webkit-background-clip:text; background-clip:text; text-transform:uppercase; filter:drop-shadow(0 0 20px rgba(255,72,115,0.12))}
+    .subtitle{margin-top:14px;margin-bottom:22px;font-size:16px;color:var(--muted);max-width:60%}
+    .btn-main{padding:14px 24px;border-radius:10px;border:0;font-weight:800;cursor:pointer;background:transparent;color: #071018; position:relative; overflow:hidden;}
+    .btn-main .inner{display:inline-block;padding:10px 18px;border-radius:8px;background:linear-gradient(90deg,var(--neon-pink),var(--neon-blue)); box-shadow:0 18px 60px rgba(0,212,255,0.06)}
+    .btn-ghost{padding:12px 18px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);color:var(--muted);font-weight:700;backdrop-filter:blur(6px)}
+
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:18px;border-radius:14px; border:1px solid rgba(155,89,255,0.08); backdrop-filter:blur(6px); box-shadow:0 8px 40px rgba(0,0,0,0.6)}
+    .agent-preview{height:260px;border-radius:10px; overflow:hidden; position:relative}
+    .agent-preview img{width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease),filter .7s}
+
+    /* section dividers */
+    .divider{display:block;width:100%;height:64px;overflow:hidden;line-height:0;transform:translateY(2px)}
+
+    /* features */
+    .features{padding:80px 0;background:linear-gradient(180deg, rgba(10,12,18,0.2), transparent 20%)}
+    .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+    .feature{padding:18px;border-radius:12px;background:var(--glass); border:1px solid rgba(0,212,255,0.06); transition:all .35s var(--ease); text-align:left; opacity:0; transform:translateY(20px)}
+    .feature.active{opacity:1; transform:none}
+    .feature:hover{transform:translateY(-10px) rotate(-0.6deg); box-shadow:0 20px 50px rgba(0,0,0,0.6); border-color: rgba(255,72,115,0.28)}
+    .feature i{font-size:30px;color:var(--neon-blue); margin-bottom:10px; display:inline-block; padding:8px; background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); border-radius:10px}
+    .feature h3{margin:6px 0 8px 0;font-size:18px;color:white}
+    .feature p{margin:0;color:var(--muted); font-size:14px}
+
+    /* gallery */
+/* --- CINEMATIC WINNERS GALLERY --- */
+.gallery {
+  padding: 80px 0;
+  text-align: center;
+}
+
+.gallery h2 {
+  font-size: 28px;
+  margin-bottom: 32px;
+  color: white;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 2px;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 22px;
+  align-items: stretch;
+}
+
+/* Each card with neon pulse */
+.gallery-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,212,255,0.05));
+  border: 2px solid transparent;
+  box-shadow: 0 0 20px rgba(255, 0, 128, 0.2);
+  animation: pulseBorder 3s infinite alternate;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Neon pulse animation */
+@keyframes pulseBorder {
+  0% {
+    box-shadow: 0 0 10px rgba(255, 72, 115, 0.4), 0 0 20px rgba(0, 212, 255, 0.3);
+    border-color: rgba(255, 72, 115, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 25px rgba(0, 212, 255, 0.5), 0 0 40px rgba(255, 72, 115, 0.4);
+    border-color: rgba(0, 212, 255, 0.8);
+  }
+}
+
+/* Image uniformity */
+.gallery-item img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  filter: brightness(1.1) contrast(1.05);
+  transition: transform 0.6s ease, filter 0.6s ease;
+}
+
+/* Hover effects */
+.gallery-item:hover {
+  transform: translateY(-6px) scale(1.05);
+  box-shadow: 0 0 45px rgba(0, 212, 255, 0.4);
+}
+
+.gallery-item:hover img {
+  transform: scale(1.12);
+  filter: brightness(1.3) saturate(1.4);
+}
+
+/* Caption overlay */
+.gallery-item::after {
+  content: attr(data-title);
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.75));
+  color: white;
+  font-weight: 700;
+  font-size: 15px;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.4s ease;
+}
+
+.gallery-item:hover::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Neon border glow loop */
+.gallery-item::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  padding: 2px;
+  background: linear-gradient(120deg, var(--neon-pink), var(--neon-blue), var(--neon-pink));
+  -webkit-mask: 
+    linear-gradient(#000 0 0) content-box, 
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: neonLoop 6s linear infinite;
+  opacity: 0.8;
+}
+
+@keyframes neonLoop {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* Responsive fix */
+@media (max-width: 560px) {
+  .gallery-item img {
+    height: 200px;
+  }
+}
+
+
+/* optional caption overlay */
+.gallery-item::after {
+  content: attr(data-title);
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.7));
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.4s var(--ease);
+}
+
+.gallery-item:hover::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* === POPUP STYLING === */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 20, 0.92);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 9999;
+  backdrop-filter: blur(6px);
+}
+
+.popup.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.popup-img {
+  max-width: 80%;
+  max-height: 80%;
+  border-radius: 16px;
+  box-shadow: 0 0 45px rgba(255, 0, 255, 0.4),
+              0 0 25px rgba(0, 255, 255, 0.3);
+  animation: popupZoom 0.35s ease;
+}
+
+@keyframes popupZoom {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.popup-close {
+  position: absolute;
+  top: 28px;
+  right: 40px;
+  font-size: 38px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 700;
+  text-shadow: 0 0 15px cyan;
+  transition: transform 0.2s ease;
+}
+
+.popup-close:hover {
+  transform: scale(1.1);
+}
+
+.popup-caption {
+  position: absolute;
+  bottom: 20px;
+  color: #fff;
+  font-size: 1.9rem;
+  font-weight: 500;
+  text-shadow: 0 0 10px #0ff;
+}
+
+
+
+
+    /* events timeline */
+    .events{padding:64px 0}
+    .timeline{display:flex;flex-direction:column; gap:18px; position:relative; padding-left:28px}
+    .timeline::before{content:"";position:absolute;left:8px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--neon-blue),var(--neon-pink)); border-radius:2px; opacity:0.9}
+    .event{padding:14px 18px;background:var(--glass); border-radius:10px; border:1px solid rgba(255,255,255,0.02); display:flex; gap:12px; align-items:center; opacity:0; transform:translateX(-10px)}
+    .event.active{opacity:1; transform:none}
+    .event .dot{width:14px;height:14px;border-radius:50%;background:var(--neon-pink); box-shadow:0 6px 12px rgba(255,72,115,0.18)}
+    .event .meta{font-weight:700;color:white}
+    .event .desc{color:var(--muted); font-size:14px}
+
+    /* leaderboard */
+    .leaderboard{padding:64px 0}
+    .board{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:10px; overflow:hidden; border:1px solid rgba(255,72,115,0.06)}
+    table{width:100%; border-collapse:collapse; color:var(--muted)}
+    th,td{padding:12px 10px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.02)}
+    th{background:var(--accent-grad); color:#071018; font-weight:800}
+    tr:hover td{background:linear-gradient(90deg, rgba(255,72,115,0.02), rgba(0,212,255,0.02))}
+
+    /* join CTA */
+    .join{padding:64px 0; display:flex; gap:28px; align-items:center; justify-content:space-between}
+    .join .left{flex:1}
+    .join .form{width:420px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:18px; border-radius:12px; border:1px solid rgba(0,212,255,0.06)}
+    .form input, .form select{width:100%; padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.04); background:transparent;color:var(--muted); margin-bottom:10px; font-weight:700}
+
+    footer{padding:36px 0; text-align:center; border-top:1px solid rgba(255,72,115,0.06); margin-top:30px}
+    .social i{font-size:22px;margin:0 8px; padding:10px;border-radius:10px; background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent); transition:transform .25s}
+    .social i:hover{transform:translateY(-6px) scale(1.06); color:var(--neon-blue)}
+
+    /* responsive */
+    @media (max-width:980px){
+      .hero-grid{grid-template-columns:1fr}
+      .gallery-grid{grid-template-columns:repeat(2,1fr)}
+      .features-grid{grid-template-columns:repeat(2,1fr)}
+      .nav{padding:8px 12px}
+      .join{flex-direction:column}
+    }
+    @media (max-width:560px){
+      .gallery-grid{grid-template-columns:1fr;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 26px;
+  justify-items: center; /* centers each image card horizontally */
+  align-items: stretch;
+}
+
+      .hero h1.title{font-size:34px}
+      .card{display:none}
+    }
+   .btn-trailer {
+  display: inline-block;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+  color: #071018;
+  font-weight: 800;
+  text-transform: uppercase;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.btn-trailer .inner {
+  display: inline-block;
+  padding: 10px 18px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
+  box-shadow: 0 18px 60px rgba(0,212,255,0.06);
+  transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+}
+
+.btn-trailer:hover .inner {
+  transform: scale(1.08);
+  box-shadow: 0 0 30px rgba(0,212,255,0.6), 0 0 60px rgba(255,72,115,0.4);
+}
+
+.btn-trailer:active .inner {
+  transform: scale(0.96);
+}
+
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 10px rgba(255, 0, 85, 0.6), 0 0 20px rgba(255, 78, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(255, 0, 85, 1), 0 0 50px rgba(255, 78, 0, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(255, 0, 85, 0.6), 0 0 20px rgba(255, 78, 0, 0.3);
+  }
+}
+.agent-showcase {
+  position: relative;
+  width: 380px;
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: transparent;
+}
+
+.agent-3d img {
+  width: 100%;
+  height: auto;
+  transform: perspective(800px) rotateY(-5deg);
+  filter: drop-shadow(0 0 30px rgba(255, 0, 200, 0.3));
+  transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+.agent-3d img:hover {
+  transform: perspective(800px) rotateY(5deg) scale(1.05);
+  filter: drop-shadow(0 0 50px rgba(0, 255, 255, 0.6));
+}
+
+.agent-info {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 12px;
+}
+
+
+  </style>
+</head>
+<body>
+
+  <!-- Progress bar -->
+  <div id="progress" aria-hidden="true"></div>
+
+  <!-- Loader -->
+  <div id="loader-wrap" role="status" aria-label="Loading">
+    <div class="loader" aria-hidden="false">
+      <div class="pulse" aria-hidden="true"></div>
+      <div style="height:18px;"></div>
+      <div class="logo" aria-hidden="true">
+        <span class="glitch" aria-hidden="true" style="display:inline-block; position:relative;">
+          <span style="opacity:0.85">Elite Strike</span>
+          <span>Elite Strike</span>
+          <span>Elite Strike</span>
+        </span>
+      </div>
+      <div class="scan" aria-hidden="true"></div>
+      <div style="margin-top:14px;color:var(--muted);font-weight:700">Initializing neon systems...</div>
+    </div>
+  </div>
+
+  <!-- Top nav -->
+  <header>
+    <nav class="nav container" role="navigation" aria-label="Main navigation">
+      <div class="logo"><i class="fa-solid fa-shield-halved"></i>&nbsp;Elite Strike</div>
+      <div class="links" style="margin-left:12px;">
+        <a href="#features">Features</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#events">Events</a>
+        <a href="#leaderboard">Leaderboard</a>
+        <a class="cta-pill" href="#join" style="background:var(--accent-grad); color:#071018; padding:8px 12px; border-radius:999px; font-weight:800; text-decoration:none">Join</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" id="home" aria-label="Hero section">
+    <video id="heroVid" autoplay muted loop playsinline>
+      <source src="trailer.mp4" type="video/mp4">
+    </video>
+    <div class="gradient-overlay" aria-hidden="true"></div>
+
+    <div class="hero-grid container" style="z-index:2; position:relative;">
+      <div class="hero-left">
+        <div class="kicker">NEW SEASON • LIVE</div>
+        <h1 class="title">Elite Strike — Outplay. Outshine.</h1>
+        <p class="subtitle">A fast tactical FPS with cyber-enhanced agents, destructible arenas, and neon-drenched combat.</p>
+
+        <div style="display:flex;gap: 9px;align-items:center;margin-top:20px;">
+          <button class="btn-main btn-play" id="playBtn" aria-label="Play now"><span class="inner"><i class="fa-solid fa-play"></i> PLAY NOW </span></button>
+  <a href="trailer.html" class="btn-main unified-btn">
+    <span class="inner"><i class="fa-solid fa-film"></i> Watch Trailer</span>
+  </a>
+        </div>
+
+        <div class="hero-stats" style="margin-top:18px">
+          <div class="stat" style="display:inline-block;padding:8px 12px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));">Mode: Ranked • Casual</div>
+          <div class="stat" style="display:inline-block;margin-left:8px;padding:8px 12px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));">Agents: 24</div>
+        </div>
+      </div>
+
+<aside class="agent-showcase">
+  <div class="agent-3d">
+    <img src="show.png" alt="Agent Reckon">
+  </div>
+  <div class="agent-info">
+    <div>
+      <div style="font-weight:900;color:var(--neon-purple)">ARQ-01 'Reckon'</div>
+      <div style="font-weight:700;color:var(--neon-blue)">Striker • Recon</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-weight:700;color:var(--neon-pink)">Ranked: Diamond</div>
+      <div style="font-size:12px;color:var(--muted)">Top Agent</div>
+    </div>
+  </div>
+</aside>
+</div>
+  </section>
+
+  <!-- svg divider -->
+  <svg class="divider" viewBox="0 0 1440 72" preserveAspectRatio="none" aria-hidden="true">
+    <defs><linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#ff4873" stop-opacity="0.25"/><stop offset="1" stop-color="#00d4ff" stop-opacity="0.1"/></linearGradient></defs>
+    <path d="M0 40 C 320 0 640 80 960 40 C 1180 10 1440 40 1440 40 L1440 72 L0 72 Z" fill="url(#g1)"></path>
+  </svg>
+
+  <!-- Features -->
+  <section class="features container" id="features" aria-labelledby="features-title">
+    <h2 id="features-title">Game Features</h2>
+    <div class="features-grid" id="featuresGrid">
+      <div class="feature"><i class="fa-solid fa-bullseye"></i><h3>Precision Ballistics</h3><p>Realistic recoil and hitbox tuning for rewarding aim skill.</p></div>
+      <div class="feature"><i class="fa-solid fa-people-arrows"></i><h3>Team Synergy</h3><p>Unique agent abilities promoting tactical coordination.</p></div>
+      <div class="feature"><i class="fa-solid fa-city"></i><h3>Dynamic Maps</h3><p>Interactive environments and destructible cover.</p></div>
+      <div class="feature"><i class="fa-solid fa-trophy"></i><h3>Ranked Seasons</h3><p>Compete in seasons to earn exclusive rewards.</p></div>
+      <div class="feature"><i class="fa-solid fa-user-gear"></i><h3>Custom Loadouts</h3><p>Modify attachments and skins to fit your playstyle.</p></div>
+      <div class="feature"><i class="fa-solid fa-server"></i><h3>Low-Latency Servers</h3><p>Optimized netcode for consistent matches.</p></div>
+    </div>
+  </section>
+
+    <section class="gallery container" id="gallery" aria-labelledby="Cinematic Gallery-title">
+
+  <div class="container">
+    <h2>Cinematic Gallery</h2>
+    <div class="gallery-grid">
+      <div class="gallery-item" data-title="AGENTS">
+        <img src="age.png" alt="AGENTS">
+      </div>
+      <div class="gallery-item" data-title="WEAPONS">
+        <img src="weap.png" alt="WEAPONS">
+      </div>
+      <div class="gallery-item" data-title="MAPS">
+        <img src="map.png" alt="MAPS">
+      </div>
+      <div class="gallery-item" data-title="VICTORY SCENE">
+        <img src="vic.png" alt="VICTORY SCENE">
+      </div>
+  </div>
+  </div>
+   <!-- Popup Modal -->
+<div id="popup" class="popup">
+  <span class="popup-close">&times;</span>
+  <img class="popup-img" src="" alt="">
+  <div class="popup-caption"></div>
+</div>
+<!-- === POPUP ELEMENT === -->
+<div class="popup" id="popup">
+  <span class="popup-close" id="popup-close">&times;</span>
+  <img src="" alt="Popup Image" class="popup-img" id="popup-img">
+  <div class="popup-caption" id="popup-caption"></div>
+</div>
+
+<!-- === POPUP SCRIPT === -->
+<script>
+  // Select popup elements
+  const popup = document.getElementById('popup');
+  const popupImg = document.getElementById('popup-img');
+  const popupCaption = document.getElementById('popup-caption');
+  const popupClose = document.getElementById('popup-close');
+
+  // Add click event to all gallery items
+  document.querySelectorAll('.gallery-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const imgSrc = item.querySelector('img').src;
+      const caption = item.getAttribute('data-title') || '';
+      popupImg.src = imgSrc;
+      popupCaption.textContent = caption;
+      popup.classList.add('active');
+    });
+  });
+
+ document.addEventListener("DOMContentLoaded", () => {
+  const popup = document.getElementById("popup");
+  const popupImg = popup.querySelector(".popup-img");
+  const popupCaption = popup.querySelector(".popup-caption");
+  const popupClose = popup.querySelector(".popup-close");
+
+  // Handle click on each gallery image
+  document.querySelectorAll(".gallery-item img").forEach(img => {
+    img.addEventListener("click", () => {
+      popupImg.src = img.src;
+      popupCaption.textContent = img.parentElement.getAttribute("data-title") || "";
+      popup.classList.add("active");
+      document.body.style.overflow = "hidden"; // prevent scroll
+    });
+  });
+
+  // Close on click of ×
+  popupClose.addEventListener("click", () => {
+    popup.classList.remove("active");
+    document.body.style.overflow = "";
+  });
+
+  // Close when clicking outside image
+  popup.addEventListener("click", (e) => {
+    if (e.target === popup) {
+      popup.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+  });
+
+  // Close on ESC key
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      popup.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+  });
+});
+</script>
+
+</section>
+
+
+
+  <!-- Events -->
+  <section class="events container" id="events" aria-labelledby="events-title">
+    <h2 id="events-title">Upcoming Events</h2>
+    <div class="timeline" id="timeline">
+      <div class="event"><div class="dot"></div><div><div class="meta">Oct 31, 2025 — Halloween Rush</div><div class="desc">Limited-time mode with explosive props and double XP.</div></div></div>
+      <div class="event"><div class="dot" style="background:var(--neon-blue)"></div><div><div class="meta">Nov 15, 2025 — Regional Cup Qualifiers</div><div class="desc">Team registration open.</div></div></div>
+      <div class="event"><div class="dot" style="background:var(--neon-purple)"></div><div><div class="meta">Dec 20, 2025 — Winter Rework Patch</div><div class="desc">Balance changes and new agent teaser.</div></div></div>
+    </div>
+  </section>
+
+  <!-- Leaderboard -->
+  <section class="leaderboard container" id="leaderboard" aria-labelledby="leaderboard-title">
+    <h2 id="leaderboard-title">Top Players</h2>
+    <div class="board">
+      <table role="table" aria-label="Leaderboard">
+        <thead><tr><th>Rank</th><th>Player</th><th>Score</th><th>Win Rate</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>ProSniper99</td><td>15,420</td><td>87%</td></tr>
+          <tr><td>2</td><td>TacticalAce</td><td>14,890</td><td>82%</td></tr>
+          <tr><td>3</td><td>EliteGamer</td><td>13,750</td><td>79%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Join -->
+  <section class="join container" id="join" aria-labelledby="join-title">
+    <div class="left">
+      <h2 id="join-title">Join the Battle</h2>
+      <p style="color:var(--muted);max-width:640px;">Sign up for season rewards, beta invites, and tournament access.</p>
+      <div style="display:flex;gap:12px;margin-top:12px;">
+        <div style="background:linear-gradient(90deg, rgba(255,72,115,0.06), rgba(0,212,255,0.03)); padding:8px 10px; border-radius:999px; font-weight:700;">Season Pass</div>
+        <div style="background:linear-gradient(90deg, rgba(155,89,255,0.06), rgba(0,212,255,0.03)); padding:8px 10px; border-radius:999px; font-weight:700;">Early Access</div>
+      </div>
+    </div>
+
+    <form class="form" id="joinForm" aria-label="Join form" style="position:relative; z-index:2;">
+      <label style="font-weight:800; color:white; margin-bottom:6px; display:block">Create Account</label>
+      <input type="text" id="fname" placeholder="Gamer tag" required>
+      <input type="email" id="email" placeholder="Email address" required>
+      <select id="region"><option value="na">Region: North America</option><option value="eu">Europe</option><option value="as">Asia</option><option value="in">India</option></select>
+      <div style="display:flex;gap:10px;margin-top:8px;">
+        <button type="submit" class="btn-main" style="flex:1"><span class="inner"><i class="fa-solid fa-rocket"></i> Join Now</span></button>
+        <button type="button" class="btn-ghost" id="demoBtn" style="flex:.6"><i class="fa-solid fa-meteor"></i> Demo</button>
+      </div>
+    </form>
+  </section>
+
+  <footer aria-label="Footer">
+    <div class="container">
+      <p style="margin:6px 0; color:var(--muted)">&copy; <span id="year"></span> Elite Strike. All rights reserved.</p>
+      <div class="social" aria-hidden="true">
+        <i class="fab fa-twitter"></i>
+        <i class="fab fa-discord"></i>
+        <i class="fab fa-youtube"></i>
+      </div>
+    </div>
+  </footer>
+
+<script>
+  // Basic helpers
+  const q = (s,o=document)=> o.querySelector(s);
+  const qa = (s,o=document)=> Array.from(o.querySelectorAll(s));
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Simulate loading, then remove loader (you can replace with real asset load checks)
+  window.addEventListener('load', () => {
+    // small delay to show loader animation
+    setTimeout(()=> {
+      const loader = q('#loader-wrap');
+      loader.style.transition = 'opacity .8s ease, transform .8s ease';
+      loader.style.opacity = '0';
+      loader.style.transform = 'translateY(-12px)';
+      setTimeout(()=> loader.remove(), 900);
+    }, 900);
+
+    // reveal first-frame animations
+    qa('.feature, .gallery-item, .event').forEach(el => el.classList.remove('active'));
+    requestAnimationFrame(()=> {
+      qa('.feature').forEach((el,i)=> setTimeout(()=> el.classList.add('active'), 220 + i*70));
+      qa('.gallery-item').forEach((el,i)=> setTimeout(()=> el.classList.add('active'), 420 + i*60));
+      qa('.event').forEach((el,i)=> setTimeout(()=> el.classList.add('active'), 620 + i*110));
+    });
+  });
+
+  // Smooth scroll for nav links
+  qa('.nav .links a').forEach(a=>{
+    a.addEventListener('click', (e)=>{
+      // anchor links only
+      const href = a.getAttribute('href');
+      if(href && href.startsWith('#')) {
+        e.preventDefault();
+        const target = q(href);
+        if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    });
+  });
+
+  // Intersection Observer for progressive reveal on scroll (works with reduced motion)
+  const prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if(!prefersReduce) {
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(en=>{
+        if(en.isIntersecting) {
+          en.target.classList.add('active');
+        }
+      });
+    }, {threshold: 0.15});
+    qa('.feature, .gallery-item, .event').forEach(el => io.observe(el));
+  } else {
+    // if reduced motion, just show all
+    qa('.feature, .gallery-item, .event').forEach(el=> el.classList.add('active'));
+  }
+
+  // Scroll progress bar
+  const progress = q('#progress');
+  window.addEventListener('scroll', ()=> {
+    const docH = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = (window.scrollY / (docH || 1)) * 100;
+    progress.style.width = pct + '%';
+  }, {passive:true});
+
+  // Play & Trailer buttons
+  q('#playBtn').addEventListener('click', ()=> {
+    q('#playBtn').animate([{transform:'translateY(0) scale(1)'},{transform:'translateY(-6px) scale(1.03)'},{transform:'translateY(0) scale(1)'}],{duration:420});
+    // replace with real launch
+    alert('Launching demo... (replace with your launch flow)');
+  });
+  q('#trailerBtn').addEventListener('click', ()=> window.open('trailer.html','_blank'));
+
+  // Form
+  q('#joinForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const name = q('#fname').value || 'Player';
+    alert(`Thanks ${name}! Confirmation will be sent to your email.`);
+    q('#joinForm').reset();
+  });
+
+  q('#demoBtn').addEventListener('click', ()=> alert('Demo: spawning AI bots... (demo placeholder)'));
+
+  // Parallax subtle for hero
+  window.addEventListener('mousemove', (e)=>{
+    const px = (e.clientX / window.innerWidth - 0.5);
+    const py = (e.clientY / window.innerHeight - 0.5);
+    const vid = q('#heroVid');
+    if(vid) vid.style.transform = `scale(1.03) translate(${px*2}%, ${py*2}%)`;
+    const agent = q('.agent-preview img');
+    if(agent) agent.style.transform = `scale(${1.03 + Math.abs(px)*0.02}) translate(${px*6}px, ${py*6}px)`;
+  });
+
+  // Keyboard shortcuts (D = demo)
+  window.addEventListener('keydown', (e)=> {
+    if(e.key.toLowerCase() === 'd') q('#demoBtn').click();
+  });
+</script>
+</body>
+</html>
