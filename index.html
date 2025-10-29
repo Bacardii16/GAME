@@ -13,81 +13,6 @@
   <meta name="color-scheme" content="dark">
 
   <style>
-  /* === FINAL RESPONSIVE FIX === */
-
-@media (max-width: 1024px) {
-  .hero-grid {
-    grid-template-columns: 1fr;
-    text-align: center;
-  }
-
-  .hero-left {
-    padding: 0 10px;
-  }
-
-  .agent-showcase {
-    margin: 30px auto 0;
-    max-width: 360px;
-  }
-
-  .hero-left h1 {
-    font-size: 2.2rem;
-    line-height: 1.3;
-  }
-
-  .hero-left p.subtitle {
-    font-size: 1rem;
-    max-width: 90%;
-    margin: 10px auto;
-  }
-
-  .btn-row {
-    justify-content: center;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .btn-main {
-    width: 80%;
-    max-width: 280px;
-  }
-
-  nav {
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-  }
-
-  footer {
-    font-size: 0.85rem;
-    text-align: center;
-  }
-}
-
-/* For smaller phones */
-@media (max-width: 600px) {
-  .hero-left h1 {
-    font-size: 1.8rem;
-  }
-
-  .hero-left p.subtitle {
-    font-size: 0.9rem;
-  }
-
-  .btn-main .inner {
-    padding: 10px 14px;
-    font-size: 0.9rem;
-  }
-
-  .agent-showcase {
-    max-width: 280px;
-  }
-
-  .gallery-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
     :root{
       --bg:#071018;
       --muted:#bfc8d1;
@@ -547,7 +472,167 @@
   width: 100%;
   margin-top: 12px;
 }
+ /* === FINAL RESPONSIVE FIX === */
+/* === SUPER RESPONSIVE FIX FOR MOBILE === */
+@media (max-width: 768px) {
+  /* Hero section fix */
+  .hero-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding: 0 20px;
+  }
 
+  .hero-left {
+    padding: 0;
+  }
+
+  .hero-left h1.title {
+    font-size: 1.8rem;
+    line-height: 1.2;
+  }
+
+  .hero-left p.subtitle {
+    font-size: 0.95rem;
+    margin: 10px auto;
+    max-width: 95%;
+  }
+
+  /* Buttons stacked + centered */
+  .btn-main {
+    width: 80%;
+    max-width: 280px;
+    margin: 6px auto;
+  }
+
+  /* Center agent image */
+  .agent-showcase {
+    width: 90%;
+    max-width: 300px;
+    margin: 40px auto 0;
+  }
+
+  /* Navbar fix */
+  nav {
+    flex-direction: column;
+    gap: 12px;
+    padding: 10px;
+  }
+
+  /* Gallery and Features layout */
+  .features-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .gallery-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Form fix */
+  .join {
+    flex-direction: column;
+  }
+
+  .form {
+    width: 90%;
+    margin-top: 20px;
+  }
+
+  /* Footer alignment */
+  footer {
+    text-align: center;
+    font-size: 0.85rem;
+  }
+}
+
+/* Ultra small phones */
+@media (max-width: 480px) {
+  .hero-left h1.title {
+    font-size: 1.6rem;
+  }
+
+  .agent-showcase {
+    max-width: 250px;
+  }
+
+  .btn-main .inner {
+    font-size: 0.85rem;
+    padding: 10px 12px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .hero-left {
+    padding: 0 10px;
+  }
+
+  .agent-showcase {
+    margin: 30px auto 0;
+    max-width: 360px;
+  }
+
+  .hero-left h1 {
+    font-size: 2.2rem;
+    line-height: 1.3;
+  }
+
+  .hero-left p.subtitle {
+    font-size: 1rem;
+    max-width: 90%;
+    margin: 10px auto;
+  }
+
+  .btn-row {
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn-main {
+    width: 80%;
+    max-width: 280px;
+  }
+
+  nav {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  footer {
+    font-size: 0.85rem;
+    text-align: center;
+  }
+}
+
+/* For smaller phones */
+@media (max-width: 600px) {
+  .hero-left h1 {
+    font-size: 1.8rem;
+  }
+
+  .hero-left p.subtitle {
+    font-size: 0.9rem;
+  }
+
+  .btn-main .inner {
+    padding: 10px 14px;
+    font-size: 0.9rem;
+  }
+
+  .agent-showcase {
+    max-width: 280px;
+  }
+
+  .gallery-grid {
+    grid-template-columns: 1fr;
+  }
+}
 
   </style>
 </head>
@@ -903,6 +988,7 @@
 </script>
 </body>
 </html>
+
 
 
 
